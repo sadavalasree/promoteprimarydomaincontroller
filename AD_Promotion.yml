@@ -1,0 +1,33 @@
+---
+- hosts: DC01
+  tasks:
+  - name: Set a single address on the adapter named Ethernet
+    win_dns_client:
+     adapter_names: Ethernet0
+     ipv4_addresses: 127.0.0.1
+  - name: Install active directory domain service role
+    win_feature:
+          name: AD-Domain-Services
+          include_management_tools: yes
+          include_sub_features: yes
+          state: present
+  - name: Promoting as a domain controller.
+    win_domain:
+      dns_domain_name: lab.local
+      safe_mode_password: Admin@123
+    register: ad
+  - name: Reboot when AD promotion requires it
+    win_reboot:
+    when: ad.changed
+  - name: Wait default 300 seconds for port 3389 to become open, don't start checking for 15 seconds
+    win_wait_for:
+      port: 389
+      delay: 15
+  - name: Create OU and sub OU's
+    win_shell: |
+      import-module activedirectory
+      New-ADOrganizationalUnit -Name "Cloud"
+      New-ADOrganizationalUnit -Name "Groups" -Path "OU=Cloud,DC=lab,DC=local"
+      New-ADOrganizationalUnit -Name "Users" -Path "OU=Cloud,DC=lab,DC=local"
+      New-ADOrganizationalUnit -Name "Servers" -Path "OU=Cloud,DC=lab,DC=local"
+      New-ADUser -Name "Sreehari Babu" -GivenName "Sreehari" -Surname "Babu" -SamAccountName "hari" -UserPrincipalName "hari@lab.local" -Path "OU=Users,OU=Cloud,DC=LAB,DC=LOCAL" -AccountPassword (ConvertTo-SecureString "sadavala@1984" -AsPlainText -Force) -Enabled $true

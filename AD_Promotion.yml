@@ -1,5 +1,5 @@
 ---
-- hosts: DC01
+- hosts: all
   tasks:
   - name: Set a single address on the adapter named Ethernet
     win_dns_client:

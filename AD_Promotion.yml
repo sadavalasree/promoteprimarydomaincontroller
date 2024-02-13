@@ -14,7 +14,7 @@
   - name: Promoting as a domain controller.
     win_domain:
       dns_domain_name: lab.local
-      safe_mode_password: Admin@123
+      safe_mode_password: "{{ pass }}"
     register: ad
   - name: Reboot when AD promotion requires it
     win_reboot:
@@ -30,4 +30,4 @@
       New-ADOrganizationalUnit -Name "Groups" -Path "OU=Cloud,DC=lab,DC=local"
       New-ADOrganizationalUnit -Name "Users" -Path "OU=Cloud,DC=lab,DC=local"
       New-ADOrganizationalUnit -Name "Servers" -Path "OU=Cloud,DC=lab,DC=local"
-      New-ADUser -Name "Sreehari Babu" -GivenName "Sreehari" -Surname "Babu" -SamAccountName "hari" -UserPrincipalName "hari@lab.local" -Path "OU=Users,OU=Cloud,DC=LAB,DC=LOCAL" -AccountPassword (ConvertTo-SecureString "sadavala@1984" -AsPlainText -Force) -Enabled $true
+      New-ADUser -Name "Sreehari Babu" -GivenName "Sreehari" -Surname "Babu" -SamAccountName "hari" -UserPrincipalName "hari@lab.local" -Path "OU=Users,OU=Cloud,DC=LAB,DC=LOCAL" -AccountPassword (ConvertTo-SecureString "{{ pass }}" -AsPlainText -Force) -Enabled $true
